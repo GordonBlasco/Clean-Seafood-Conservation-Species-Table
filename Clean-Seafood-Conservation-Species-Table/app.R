@@ -38,7 +38,7 @@ body <- dashboardBody(
 )
 
 ui <- dashboardPage(
-    dashboardHeader(title = "Table for OceanKind"),
+    dashboardHeader(title = "Clean Seafood Conservation Species Table"),
     dashboardSidebar(disable = TRUE),
     body
 )
