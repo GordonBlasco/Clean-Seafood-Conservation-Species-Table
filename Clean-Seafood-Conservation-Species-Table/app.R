@@ -14,8 +14,11 @@ library(shinydashboard)
 library(shinyWidgets)
 library(formattable)
 
+#setwd("./Clean-Seafood-Conservation-Species-Table")
 #data <- readRDS("./Clean-Seafood-Conservation-Species-Table/shinydata.rds")
 
+
+#### Table Body ####
 body <- dashboardBody(
     fluidRow(
         column(width = 3,
@@ -24,7 +27,7 @@ body <- dashboardBody(
                    
                    h3("Assessment Type:"),
                    switchInput(
-                       inputId = "switch",
+                       inputId = "assess",
                        label = "RAM Only",
                        value = TRUE),
                    
@@ -58,9 +61,8 @@ body <- dashboardBody(
                                    "NT", 
                                    "VU", 
                                    "EN", 
-                                   "CR", 
-                                   "EX"),
-                       selected = c("VU", "EX")
+                                   "CR"),
+                       selected = c("VU", "CR")
                        
                        ),
                    
@@ -91,6 +93,8 @@ body <- dashboardBody(
     )
 )
 
+
+#### UI ####
 ui <- dashboardPage(
     dashboardHeader(title = "Clean Seafood Conservation Species Table"),
     dashboardSidebar(
@@ -100,17 +104,29 @@ ui <- dashboardPage(
     body
 )
 
+
+#### Server ####
 server <- function(input, output) {
     
     #  data <- readRDS("shinydata.rds") %>% 
     #      filter(
     #          filter(`Proportion of Fishereis Being Overfished (BMSY < 1)` >= input$BMSY)
     #      )
+
     
+
+    
+#### Table Output ####
     output$table <- renderFormattable({formattable(
         
         
         data <- readRDS("shinydata.rds") %>% 
+            
+            {if ((input$assess) == TRUE) dplyr::filter(., SOURCE == "RAM")
+                
+                else dplyr::filter(., SOURCE == "ALL")
+                
+            } %>% 
             
             {if 
                 #(is.null(input$aqua)) . 
@@ -122,6 +138,8 @@ server <- function(input, output) {
                                          `IUCN Status` <= input$stat_slide[2])
                                         )
             } %>% 
+            
+            select(-SOURCE) %>% 
             
             filter(`Proportion of Fisheries Experiencing Overfishing (FMSY > 1)` >= input$FMSY[1] & 
                        `Proportion of Fisheries Experiencing Overfishing (FMSY > 1)` <= input$FMSY[2]) %>% 
@@ -155,12 +173,11 @@ server <- function(input, output) {
                     "border-radius" = "4px",
                     "width" = "60px",
                     "background-color" = case_when(
-                        `IUCN Status` == "LC" ~ "lightblue",
-                        `IUCN Status` == "NT"  ~"green",
+                        `IUCN Status` == "LC" ~ "green",
+                        `IUCN Status` == "NT"  ~"lightgreen",
                         `IUCN Status` == "VU"  ~"yellow",
                         `IUCN Status` == "EN"  ~"orange",
-                        `IUCN Status` == "CR"  ~"red",
-                        `IUCN Status` == "EX"  ~"red",
+                        `IUCN Status` == "CR"  ~"red"
                     )
                 )),
             
@@ -216,5 +233,10 @@ server <- function(input, output) {
 
             )
     )})
+    
+#### Plotly Output ####    
+
+    
+#### End of App ####
 }
 shinyApp(ui = ui, server = server)
