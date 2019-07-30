@@ -48,9 +48,9 @@ body <- dashboardBody(
                                      status = "primary"),
                    
                    
-                   sliderInput("FMSY", h3("FMSY needed:"),  0.00, 1.0, value = c(.50, 1.0)),
+                   sliderInput("FMSY", h3("Proportion of Stocks Experiencing Overfishing:"),  0.00, 1.0, value = c(.50, 1.0)),
                    
-                   sliderInput("BMSY", h3("BMSY needed:"),  0.00, 1.0, value = c(.50, 1.0)),
+                   sliderInput("BMSY", h3("Proportion of Stocks Being Overfished:"),  0.00, 1.0, value = c(.50, 1.0)),
                    
                    sliderTextInput(
                        inputId = "stat_slide", 
@@ -153,6 +153,17 @@ server <- function(input, output) {
             arrange(dplyr::desc(!!rlang::sym(input$arrange))) %>% 
             mutate(`Proportion of Fisheries Experiencing Overfishing (FMSY > 1)` = percent(`Proportion of Fisheries Experiencing Overfishing (FMSY > 1)`),
                    `Proportion of Fishereis Being Overfished (BMSY < 1)` = percent(`Proportion of Fishereis Being Overfished (BMSY < 1)`)) ,
+        
+    
+        col.names = c("Common Name",
+                      "Scientific Name",
+                      "Number of Stocks",
+                      "Proportion of Stocks Experiencing Overfishing (FMSY > 1)",
+                      "Proportion of Stocks Being Overfished (BMSY < 1)", 
+                      "Revenue (Thousands USD)",
+                      "IUCN Status",
+                      "Aquaculture Alternative"
+        ),
         
         
         align = c("l", "l", "c", "c", "c", "c", "c", "c"),
